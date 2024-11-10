@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="toolbar">
+        <p class="name-toolbar">Listly</p>
+        <nav>
+            <ul class="nav-toolbar">
+                <li><a href="#task">Tasks</a></li>
+                <li><a href="#interview-meeting">Interviews & Meetings</a></li>
+                <li><a href="#income-outcome">Income & Outcome</a></li>
+            </ul>
+        </nav>
+    </div>
+    <section id="task">
+        <h2 class="task-header">Input Your Task</h2>
+        <div class="task-input-container">
+            <form method="POST" action="/">
+                <label class="task-attribute" for="task_name">Task name: </label>
+                <input type="text" id="task_name" name="task_name" required>
+                <br>
+                <label class="task-attribute" for="deadline">Deadline :  </label>
+                <input type="datetime-local" id="deadline" name="deadline" required>
+                <br>
+                <button class="button" type="submit">Add Task </button>
+            </form>
+        </div>
+        <br>
+
+        <!-- Tombol untuk menampilkan tabel tugas -->
+        <button class="button" onclick="document.getElementById('task-list').style.display = 'block'">View Tasks</button>
+
+        <!-- Tabel tugas -->
+        <div id="task-list" style="display:none;">
+            <h2 class="task-header">Task List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <td>{{ task.name }}</td>
+                            <td>{{ task.deadline.strftime('%Y-%m-%d %H:%M') }}</td> <!-- Format datetime -->
+                            <td>{{ task.status }}</td>
+                            <td>
+                                <!-- Tombol untuk mengubah status -->
+                                <form action="{{ url_for('update_status', task_index=loop.index0) }}" method="POST" style="display:inline;">
+                                    <button class="button-status" type="submit">{{ 'Finish' if task.status == 'Not Finished' else 'Undo' }}</button>
+                                </form>
+                                <!-- Tombol untuk menghapus tugas -->
+                                {% if task.status == 'Finished' %}
+                                    <a class="delete-sign" href="{{ url_for('delete_task', task_index=loop.index0) }}" onclick="return confirm('Are you sure you want to delete this task?')">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</html>
+ 
